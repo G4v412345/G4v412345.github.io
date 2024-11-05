@@ -101,61 +101,73 @@
         </div>
     </div>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let currentNode = document.body;
-            let parentNodes = [];
+    document.addEventListener("DOMContentLoaded", function () {
+        let currentNode = document.body;
+        let parentNodes = [];
     
-            function showNodeContent(callback) {
-                let content = currentNode.textContent.trim() || "Узел без текстового содержимого";
-                let maxLength = 200; 
-                if (content.length > maxLength) {
-                    content = content.slice(0, maxLength) + "..."; 
-                }
-                let message = `Текущий узел:\n${content}\n\nПерейти к следующему узлу? (Да/Нет/Назад)`;
-    
-                let userChoice = prompt(message);
-                if (userChoice === null) return;
-                userChoice = userChoice.toLowerCase();
-    
-                if (userChoice === "да") {
-                    callback("next");
-                } else if (userChoice === "назад") {
-                    callback("prev");
-                } else {
-                    alert("Завершение работы.");
-                }
+        function showNodeContent(callback) {
+            let content = currentNode.textContent.trim() || "Узел без текстового содержимого";
+            let maxLength = 200;
+            if (content.length > maxLength) {
+                content = content.slice(0, maxLength) + "...";
             }
     
-            function navigateDOM(direction) {
-                if (direction === "next") {
-                    if (currentNode.firstElementChild) {
-                        parentNodes.push(currentNode);
-                        currentNode = currentNode.firstElementChild;
-                    } else if (currentNode.nextElementSibling) {
+            const isLeafNode = !currentNode.firstElementChild && !currentNode.nextElementSibling && parentNodes.length === 0;
+            const isScriptNode = currentNode.tagName === "SCRIPT";
+            let message = `Текущий узел:\n${content}\n\n`;
+    
+            if (isScriptNode || isLeafNode) {
+                message += "Вы достигли конца дерева. Вернуться назад? (Назад) или выйти? (Выход)";
+            } else {
+                message += "Перейти к следующему узлу? (Да/Нет/Назад)";
+            }
+    
+            let userChoice = prompt(message);
+            if (userChoice === null) return;
+            userChoice = userChoice.toLowerCase();
+    
+            if (userChoice === "да" && !isLeafNode && !isScriptNode) {
+                callback("next");
+            } else if (userChoice === "назад") {
+                callback("prev");
+            } else {
+                alert("Завершение работы.");
+            }
+        }
+    
+        function navigateDOM(direction) {
+            if (direction === "next") {
+                if (currentNode.firstElementChild) {
+                    parentNodes.push(currentNode);
+                    currentNode = currentNode.firstElementChild;
+                } else if (currentNode.nextElementSibling) {
+                    currentNode = currentNode.nextElementSibling;
+                } else {
+                    while (currentNode && !currentNode.nextElementSibling) {
+                        currentNode = parentNodes.pop();
+                    }
+                    if (currentNode) {
                         currentNode = currentNode.nextElementSibling;
                     } else {
-                        while (currentNode && !currentNode.nextElementSibling) {
-                            currentNode = parentNodes.pop();
-                        }
-                        if (currentNode) currentNode = currentNode.nextElementSibling;
-                    }
-                } else if (direction === "prev") {
-                    if (parentNodes.length > 0) {
-                        currentNode = parentNodes.pop();
-                    } else {
-                        alert("Вы находитесь на верхнем уровне. Нет возможности вернуться назад.");
+                        alert("Конец дерева. Можно вернуться назад.");
+                        return navigateDOM("prev");
                     }
                 }
-                if (currentNode) {
-                    showNodeContent(navigateDOM);
+            } else if (direction === "prev") {
+                if (parentNodes.length > 0) {
+                    currentNode = parentNodes.pop();
                 } else {
-                    alert("Конец дерева DOM.");
+                    alert("Вы находитесь на верхнем уровне. Больше некуда вернуться.");
                 }
             }
     
-            showNodeContent(navigateDOM);
-        });
-    </script>
+            if (currentNode) {
+                showNodeContent(navigateDOM);
+            }
+        }
     
+        showNodeContent(navigateDOM);
+    });
+    </script>
 </body>
 </html>
