@@ -26,7 +26,7 @@ function parseData(d)
     renderDate(formatDate, names);
 }
 
-function renderDate(date, names)
+function renderDate(data, names)
 {
     console.log(data);
 }
