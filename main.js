@@ -39,11 +39,11 @@ function renderDate(data, names)
     DOM_TABLE.innerHTML = html;
 }
 
-function getTableHead([n, name, price])
+function getTableHead([order, name, price])
 {
     return `
                   <tr>
-                    <th scope="col">#</th>
+                    <th scope="col">${order}</th>
                     <th scope="col">${name}</th>
                     <th scope="col">${price}</th>
                 </tr>
