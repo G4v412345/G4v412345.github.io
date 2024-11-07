@@ -29,6 +29,38 @@ function parseData(d)
 function renderDate(data, names)
 {
     console.log(data);
+    const html = `
+        ${getTableHead(names)}
+        <tbody>
+        ${getTableBody(data)}
+        </tbody>
+    `;
+
+    DOM_TABLE.innerHTML = html;
+}
+
+function getTableHead([n, name, price])
+{
+    return `
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">${name}</th>
+                    <th scope="col">${price}</th>
+                </tr>
+    `;
+}
+
+function getTableBody(data)
+{
+    return data.map(({order, name, price}) => {
+        return `
+        <tr>
+            <th scope="row">${order}</th>
+            <td>${name}</td>
+            <td>${price}</td>
+        </tr>`;
+        }).join('');
+        
 }
 
 loadDate();
