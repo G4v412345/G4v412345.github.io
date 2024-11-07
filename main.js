@@ -1,62 +1,66 @@
 const URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTslcJFOhtuuGhCACdPhCADrq0gBHG1bKj6JcYXsZKCupOkJlM6MyDonSz1RAGXvUMqZ6wipILxHI6A/pub?gid=1619251371&single=true&output=tsv';
 
-const SEP_LINE = '\n';
-const SEP_CELL = '\t';
-const DOM_TABLE = document.querySelector('.price-table table');
+const  SEP_LINE = '\r\n';
+const  SEP_CELL = '\t';
+const  DOM_TABLE = document.querySelector('.price-table table');
 
-function loadDate() {
-    fetch(URL)
-        .then(response => response.text())
-        .then(parseData)
-        .catch(error => console.error('Error fetching or parsing data:', error));
+function loadDate() 
+{
+    fetch(URL).then(r => r.text()).then(parseData);
 }
 
-function parseData(data) {
-    const tableArr = data.trim().split(SEP_LINE).map(row => row.split(SEP_CELL));
-    const headers = tableArr.shift(); // предполагается ['order', 'name', 'price']
+function parseData(d)
+{
+    const tableArr = d.split(SEP_LINE).map(r => r.split(SEP_CELL));
+    const names = tableArr.shift();
 
-    const formattedData = tableArr.map(row => {
-        return {
-            order: row[0],
-            name: row[1],
-            price: row[2]
-        };
-    });
+    const formatDate = tableArr.map(e1 =>
+        {
+            const name = {};
+            names.forEach((nam, i) => name[nam] = e1[i]);
 
-    renderData(formattedData);
+            return name;
+        }
+    );
+
+    renderDate(formatDate, names);
 }
 
-function renderData(data) {
+function renderDate(data, names)
+{
+    console.log(data);
     const html = `
-        ${getTableHead()}
+        ${getTableHead(names)}
         <tbody>
-            ${getTableBody(data)}
+        ${getTableBody(data)}
         </tbody>
     `;
 
     DOM_TABLE.innerHTML = html;
 }
 
-function getTableHead() {
+function getTableHead([order, name, price])
+{
     return `
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Price</th>
-            </tr>
-        </thead>
+                  <tr>
+                    <th scope="col">$</th>
+                    <th scope="col">${name}</th>
+                    <th scope="col">${price}</th>
+                </tr>
     `;
 }
 
-function getTableBody(data) {
-    return data.map(({ order, name, price }) => `
+function getTableBody(data)
+{
+    return data.map(({order, name, price}) => {
+        return `
         <tr>
             <th scope="row">${order}</th>
             <td>${name}</td>
             <td>${price}</td>
-        </tr>
-    `).join('');
+        </tr>`;
+        }).join('');
+        
 }
 
 loadDate();
