@@ -14,7 +14,7 @@ function loadData() {
 function parseData(data) {
     const rows = data.trim().split(SEP_LINE);
     const headers = rows[0].split(SEP_CELL);  
-    const bodyRows = rows.slice(1).map(row => row.split(SEP_CELL));  /
+    const bodyRows = rows.slice(1).map(row => row.split(SEP_CELL));  
 
     renderTable(headers, bodyRows);
 }
