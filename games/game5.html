@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Snowball Math + Words ❄</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        #taskWord {
+            font-size: 42px;
+            margin: 20px 0;
+        }
+
+        #gameArea {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .snowball {
+            font-size: 32px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            padding: 25px 30px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .snowball:hover {
+            transform: scale(1.1);
+        }
+
+        #resultMessage {
+            font-size: 28px;
+            margin-top: 20px;
+        }
+
+        .rules-box {
+            margin-top: 40px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body class="winter-bg">
+
+<div class="game-container">
+
+    <button class="back-btn" onclick="goBack()">⬅ Назад</button>
+
+    <div id="taskWord"></div>
+
+    <div id="gameArea"></div>
+
+    <p id="resultMessage"></p>
+
+    <div class="rules-box">
+        <h2>🎯 How to play</h2>
+        <p>
+            Break the snowball with the correct word!
+        </p>
+        <p class="ua-rules">
+            Розбий сніжку з правильним словом!
+        </p>
+    </div>
+
+</div>
+
+<script>
+const tasks = [
+    { correct: "MITTEN", options: ["MITTEN", "MITON", "MITTEN"] },
+    { correct: "SNOW", options: ["SNOU", "SNOW", "SNO"] },
+    { correct: "ICE", options: ["ISE", "ICE", "ICEE"] },
+    { correct: "BOOT", options: ["BOOOT", "BOOT", "BOUT"] },
+    { correct: "STAR", options: ["STARE", "STAR", "STUR"] }
+];
+
+let currentTask;
+let clickable = true;
+
+function startRound() {
+    clickable = true;
+    document.getElementById("resultMessage").textContent = "";
+    document.getElementById("gameArea").innerHTML = "";
+
+    currentTask = tasks[Math.floor(Math.random() * tasks.length)];
+
+    document.getElementById("taskWord").textContent =
+        "Find the correct word: ";
+
+    currentTask.options = shuffle(currentTask.options);
+
+    currentTask.options.forEach(word => {
+        const ball = document.createElement("div");
+        ball.className = "snowball";
+        ball.textContent = word;
+        ball.onclick = () => checkAnswer(word, ball);
+        document.getElementById("gameArea").appendChild(ball);
+    });
+}
+
+function checkAnswer(word, element) {
+    if (!clickable) return;
+
+    if (word === currentTask.correct) {
+        clickable = false;
+        element.textContent = "✅";
+        document.getElementById("resultMessage").textContent = "Good job! ✅";
+        speakText(word);
+
+        setTimeout(startRound, 1000);
+
+    } else {
+        element.textContent = "❌";
+        document.getElementById("resultMessage").textContent = "Try again!";
+        speakText("Try again");
+
+        setTimeout(startRound, 1000);
+    }
+}
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function speakText(text) {
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US";
+    speech.rate = 0.8;
+    window.speechSynthesis.speak(speech);
+}
+
+function goBack() {
+    window.location.href = "../index.html";
+}
+
+startRound();
+</script>
+
+</body>
+</html>

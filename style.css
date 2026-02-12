@@ -1,0 +1,149 @@
+body {
+    margin: 0;
+    font-family: Comic Sans MS, cursive, sans-serif;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.container {
+    width: 90%;
+    max-width: 900px;
+}
+
+.title {
+    font-size: 48px;
+    color: white;
+    margin-bottom: 10px;
+    animation: bounce 2s infinite;
+}
+
+.subtitle {
+    font-size: 20px;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+button {
+    font-size: 20px;
+    padding: 15px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    background: white;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.1);
+    background: #fff176;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* WINTER GAME */
+
+.winter-bg {
+    background: linear-gradient(#a1c4fd, #c2e9fb);
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes snow {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(100vh); }
+}
+
+.game-container {
+    text-align: center;
+    margin-top: 50px;
+}
+
+#wordDisplay {
+    font-size: 48px;
+    color: white;
+}
+
+.sound-btn {
+    font-size: 25px;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 15px;
+}
+
+.items {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.item {
+    background: white;
+    padding: 20px;
+    font-size: 22px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    min-width: 120px;
+}
+
+.item:hover {
+    transform: scale(1.1);
+}
+
+.correct {
+    background: #81c784;
+}
+
+.wrong {
+    background: #e57373;
+}
+
+#resultMessage {
+    font-size: 22px;
+    margin-top: 30px;
+    color: white;
+}
+
+.next-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 20px;
+    border-radius: 15px;
+}
+
+.rules-box {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 15px;
+    max-width: 500px;
+    margin: 0 auto 20px auto;
+    margin-top: 40px;
+    font-size: 16px;
+}
+
+.rules-box h2 {
+    margin: 0 0 10px 0;
+    color: #1976d2;
+}
+
+.ua-rules {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+}
+

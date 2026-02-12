@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Match the Word with the Picture 📚</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+body { font-family: sans-serif; margin: 0; padding: 0; }
+.game-container { width: 90%; margin: 20px auto; text-align: center; }
+.header { display: flex; justify-content: center; margin-bottom: 20px; }
+.items-container { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 20px; }
+.words-column, .pictures-column { display: flex; flex-direction: column; gap: 15px; width: 45%; }
+.word-item, .picture-item { font-size: 28px; cursor: pointer; user-select: none; text-align: center; padding: 10px; border: 2px solid white; border-radius: 10px; background: rgba(255,255,255,0.1); transition: 0.2s; }
+.word-item.selected { border-color: #2196F3; background: rgba(33, 150, 243, 0.2); }
+.word-item.correct, .picture-item.correct { border-color: #4CAF50; background: rgba(76, 175, 80, 0.2); }
+.word-item.wrong, .picture-item.wrong { border-color: #F44336; background: rgba(244, 67, 54, 0.2); }
+#scoreBoard { font-size: 24px; margin: 10px; }
+.rules-box { margin-top: 30px; font-size: 18px; }
+.picture-item .emoji { font-size: 50px; }
+.next-btn { margin-top: 20px; font-size: 20px; padding: 8px 20px; }
+</style>
+</head>
+<body class="winter-bg">
+
+<div class="game-container">
+
+<div class="header">
+    <button class="back-btn" onclick="goBack()">⬅ Назад</button>
+</div>
+
+<div id="scoreBoard">Score: <span id="score">0</span></div>
+
+<div class="items-container">
+    <div class="words-column" id="wordsColumn"></div>
+    <div class="pictures-column" id="picturesColumn"></div>
+</div>
+
+<button class="next-btn" onclick="startRound()">Next Round ➡</button>
+
+<div class="rules-box">
+<h3>🎯 How to play</h3>
+<p>Click on a word, then click on the matching picture. Only 4 words and 4 pictures each round. Match them correctly!</p>
+<p class="ua-rules">Натисни на слово, потім на відповідну картинку. Кожен раунд — по 4 слова та 4 картинки. Зроби всі правильно!</p>
+</div>
+
+</div>
+
+<script>
+const allItems = [
+{word:"Hat", icon:"🎩"},
+{word:"Scarf", icon:"🧣"},
+{word:"Mitten", icon:"🧤"},
+{word:"Sweater", icon:"🧥"},
+{word:"Boots", icon:"🥾"},
+{word:"Toy", icon:"🧸"},
+{word:"Doll", icon:"🪆"},
+{word:"Train", icon:"🚂"},
+{word:"Ice", icon:"🧊"},
+{word:"Frost", icon:"🌬️"},
+{word:"Snowflake", icon:"❄️"},
+{word:"Christmas tree", icon:"🎄"},
+{word:"Star", icon:"⭐"},
+{word:"Winter", icon:"🌨️"}
+];
+
+let score = 0;
+let selectedWord = null;
+const wordsColumn = document.getElementById("wordsColumn");
+const picturesColumn = document.getElementById("picturesColumn");
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+startRound();
+
+function startRound() {
+    const shuffledItems = shuffle([...allItems]);
+    const roundItems = shuffledItems.slice(0,4);
+
+    wordsColumn.innerHTML = "";
+    picturesColumn.innerHTML = "";
+
+    const wordDivs = [];
+    const picDivs = [];
+
+    roundItems.forEach(item => {
+        const wordDiv = document.createElement("div");
+        wordDiv.className = "word-item";
+        wordDiv.textContent = item.word;
+        wordDiv.dataset.word = item.word;
+        wordDiv.addEventListener("click", () => {
+            if(selectedWord) selectedWord.classList.remove("selected");
+            selectedWord = wordDiv;
+            wordDiv.classList.add("selected");
+        });
+        wordDivs.push(wordDiv);
+
+        const picDiv = document.createElement("div");
+        picDiv.className = "picture-item";
+        picDiv.dataset.word = item.word;
+        picDiv.innerHTML = `<div class="emoji">${item.icon}</div>`;
+        picDiv.addEventListener("click", () => {
+            if(!selectedWord) return;
+            const draggedWord = selectedWord.dataset.word;
+            if(draggedWord === item.word) {
+                score++;
+                document.getElementById("score").textContent = score;
+                selectedWord.classList.add("correct");
+                picDiv.classList.add("correct");
+                speakText(item.word);
+            } else {
+                selectedWord.classList.add("wrong");
+                picDiv.classList.add("wrong");
+                speakText("Try again!");
+                setTimeout(() => { selectedWord.classList.remove("wrong"); picDiv.classList.remove("wrong"); }, 500);
+            }
+            selectedWord.classList.remove("selected");
+            selectedWord = null;
+        });
+        picDivs.push(picDiv);
+    });
+
+    shuffle(wordDivs).forEach(div => wordsColumn.appendChild(div));
+    shuffle(picDivs).forEach(div => picturesColumn.appendChild(div));
+}
+
+
+function speakText(text) {
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US";
+    speech.rate = 0.85;
+    window.speechSynthesis.speak(speech);
+}
+
+function goBack() {
+    window.location.href = "../index.html";
+}
+</script>
+
+</body>
+</html>

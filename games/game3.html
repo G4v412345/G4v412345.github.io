@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Yes or No Game ❄</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+
+    #cardContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 10px 0;
+    }
+
+    #imageDisplay {
+        font-size: 70px; /* Збільшили картинку */
+        margin-bottom: 10px;
+    }
+
+
+
+    </style>
+</head>
+<body class="winter-bg">
+
+<div class="game-container">
+
+    <button class="back-btn" onclick="goBack()">⬅ Назад</button>
+
+    <div id="cardContainer" class="card">
+        <div id="imageDisplay" class="image">🧣</div>
+        <h1 id="wordDisplay">SCARF</h1>
+    </div>
+
+    <div class="answer-buttons">
+        <button class="yes-btn" onclick="checkAnswer(true)">YES ✅</button>
+        <button class="no-btn" onclick="checkAnswer(false)">NO ❌</button>
+    </div>
+
+    <p id="resultMessage"></p>
+    <button class="next-btn" onclick="startRound()">Next ❄</button>
+
+    <div class="rules-box">
+        <h2>🎯 How to play</h2>
+        <p>
+            Look at the word and the picture.<br>
+            If the word matches the picture, click YES.<br>
+            If it does not match, click NO.
+        </p>
+
+        <p class="ua-rules">
+            Подивись на слово та картинку.<br>
+            Якщо слово підходить до картинки — натисни YES.<br>
+            Якщо не підходить — натисни NO.
+        </p>
+    </div>
+
+</div>
+
+<script>
+const items = {
+    clothes: [
+        {word: "Hat", icon: "🎩"},
+        {word: "Scarf", icon: "🧣"},
+        {word: "Mitten", icon: "🧤"},
+        {word: "Sweater", icon: "🧥"},
+        {word: "Boots", icon: "🥾"}
+    ],
+    toys: [
+        {word: "Toy", icon: "🧸"},
+        {word: "Doll", icon: "🪆"},
+        {word: "Train", icon: "🚂"}
+    ],
+    winter: [
+        {word: "Snow", icon: "❄️"},
+        {word: "Ice", icon: "🧊"},
+        {word: "Frost", icon: "🌨️"}
+    ],
+    holiday: [
+        {word: "Christmas tree", icon: "🎄"},
+        {word: "Star", icon: "⭐"}
+    ]
+};
+
+let currentItem = null;
+let isCorrectMatch = true;
+
+function startRound() {
+    document.getElementById("resultMessage").textContent = "";
+
+    const categories = Object.keys(items);
+    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+    const categoryItems = items[randomCategory];
+
+    const wordItem = categoryItems[Math.floor(Math.random() * categoryItems.length)];
+
+    isCorrectMatch = Math.random() < 0.5;
+
+    let displayItem;
+    if (isCorrectMatch) {
+        displayItem = wordItem;
+    } else {
+        const otherCategories = categories.filter(c => c !== randomCategory);
+        const otherCategory = otherCategories[Math.floor(Math.random() * otherCategories.length)];
+        const otherItems = items[otherCategory];
+        displayItem = otherItems[Math.floor(Math.random() * otherItems.length)];
+    }
+
+    currentItem = wordItem;
+
+    document.getElementById("wordDisplay").textContent = wordItem.word.toUpperCase();
+    document.getElementById("imageDisplay").textContent = displayItem.icon;
+}
+
+function checkAnswer(userAnswer) {
+    const resultMessage = document.getElementById("resultMessage");
+
+    if (userAnswer === isCorrectMatch) {
+        resultMessage.textContent = "Good job! ✅";
+        speakText("Good job!");
+    } else {
+        resultMessage.textContent = "Try again! ❌";
+        speakText("Try again!");
+    }
+}
+
+function speakText(text) {
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US";
+    speech.rate = 0.8;
+    window.speechSynthesis.speak(speech);
+}
+
+function goBack() {
+    window.location.href = "../index.html";
+}
+
+startRound();
+</script>
+
+</body>
+</html>

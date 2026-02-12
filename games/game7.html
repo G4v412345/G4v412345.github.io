@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Winter Word Hunt 🔎❄</title>
+<link rel="stylesheet" href="../style.css">
+
+<style>
+
+#grid {
+    display: grid;
+    grid-template-columns: repeat(4, 70px);
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.cell {
+    width: 70px;
+    height: 70px;
+    font-size: 30px;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.2s;
+}
+
+.cell:hover {
+    transform: scale(1.1);
+}
+
+.cell.selected {
+    background: #aee4ff;
+}
+
+.cell.found {
+    background: #4CAF50;
+    color: white;
+}
+
+.word-list {
+    font-size: 22px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.word-item.found-word {
+    text-decoration: line-through;
+    color: #4CAF50;
+}
+
+#scoreBoard {
+    font-size: 24px;
+    margin-top: 10px;
+}
+
+.rules-box {
+    margin-top: 40px;
+    font-size: 20px;
+}
+
+.next-btn {
+    font-size: 26px;
+    padding: 12px 25px;
+    margin-top: 15px;
+}
+
+</style>
+</head>
+
+<body class="winter-bg">
+
+<div class="game-container">
+
+<button class="back-btn" onclick="goBack()">⬅ Назад</button>
+<br><br>
+<div id="grid"></div>
+
+<div class="word-list" id="wordList"></div>
+
+<div id="scoreBoard"></div>
+
+<button class="next-btn" onclick="startGame()">Restart ❄</button>
+
+<div class="rules-box">
+<h3>🎯 How to play</h3>
+<p>
+Find the hidden winter words.<br>
+Click letters in order!
+</p>
+
+<p class="ua-rules">
+Знайди зимові слова.<br>
+Натискай літери по порядку!
+</p>
+</div>
+
+</div>
+
+<script>
+
+const words = [
+{word:"HAT", hint:"🎩"},
+{word:"ICE", hint:"🧊"},
+{word:"TOY", hint:"🧸"},
+{word:"STAR", hint:"⭐"}
+];
+
+const gridSize = 4;
+
+let gridElement = document.getElementById("grid");
+let wordListElement = document.getElementById("wordList");
+let scoreBoard = document.getElementById("scoreBoard");
+
+let selectedCells = [];
+let foundCount = 0;
+
+function startGame() {
+
+let success = false;
+
+while(!success) {
+
+success = true;
+
+gridElement.innerHTML = "";
+wordListElement.innerHTML = "";
+selectedCells = [];
+foundCount = 0;
+
+scoreBoard.textContent = `Found: 0 / ${words.length}`;
+
+let grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(''));
+
+for (let item of words) {
+
+    let placed = false;
+    let attempts = 0;
+
+    while(!placed && attempts < 50) {
+
+        attempts++;
+
+        let dir = Math.random() < 0.5 ? "H" : "V";
+        let row = Math.floor(Math.random() * gridSize);
+        let col = Math.floor(Math.random() * gridSize);
+
+        if(canPlace(grid, item.word, row, col, dir)) {
+            placeWord(grid, item.word, row, col, dir);
+            placed = true;
+        }
+    }
+
+    if(!placed) {
+        success = false;
+        break;
+    }
+}
+
+if(!success) continue;
+
+for(let r=0; r<gridSize; r++) {
+    for(let c=0; c<gridSize; c++) {
+        if(grid[r][c] === '') {
+            grid[r][c] = String.fromCharCode(65 + Math.floor(Math.random()*26));
+        }
+    }
+}
+
+grid.forEach((row,r)=>{
+    row.forEach((letter,c)=>{
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.textContent = letter;
+
+        cell.onclick = ()=>selectCell(cell);
+
+        gridElement.appendChild(cell);
+    });
+});
+
+words.forEach(item=>{
+    const div = document.createElement("div");
+    div.className = "word-item";
+    div.textContent = `${item.hint} ${item.word}`;
+    wordListElement.appendChild(div);
+});
+
+}
+}
+
+function canPlace(grid, word, row, col, dir) {
+
+if(dir==="H" && col + word.length > gridSize) return false;
+if(dir==="V" && row + word.length > gridSize) return false;
+
+for(let i=0;i<word.length;i++) {
+
+let r = dir==="H" ? row : row + i;
+let c = dir==="H" ? col + i : col;
+
+if(grid[r][c] !== '' && grid[r][c] !== word[i]) return false;
+
+}
+
+return true;
+}
+
+function placeWord(grid, word, row, col, dir) {
+
+for(let i=0;i<word.length;i++) {
+
+let r = dir==="H" ? row : row + i;
+let c = dir==="H" ? col + i : col;
+
+grid[r][c] = word[i];
+}
+
+}
+
+function selectCell(cell) {
+
+if(cell.classList.contains("found")) return;
+
+cell.classList.toggle("selected");
+
+if(cell.classList.contains("selected")) selectedCells.push(cell);
+else selectedCells = selectedCells.filter(c => c!==cell);
+
+checkWord();
+}
+
+function checkWord() {
+
+if(selectedCells.length < 2) return;
+
+let letters = selectedCells.map(c=>c.textContent).join('');
+let lettersRev = letters.split('').reverse().join('');
+
+for(let i=0;i<words.length;i++) {
+
+if(letters === words[i].word || lettersRev === words[i].word) {
+
+selectedCells.forEach(c=>{
+    c.classList.remove("selected");
+    c.classList.add("found");
+});
+
+document.querySelectorAll(".word-item")[i].classList.add("found-word");
+
+speakText("Good job");
+
+foundCount++;
+scoreBoard.textContent = `Found: ${foundCount} / ${words.length}`;
+
+selectedCells = [];
+return;
+}
+}
+}
+
+function speakText(text) {
+let speech = new SpeechSynthesisUtterance(text);
+speech.lang = "en-US";
+speech.rate = 0.8;
+window.speechSynthesis.speak(speech);
+}
+
+function goBack() {
+window.location.href = "../index.html";
+}
+
+startGame();
+
+</script>
+</body>
+</html>

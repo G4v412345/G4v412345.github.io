@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Drag the Word ❄</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .big-word {
+            font-size: 64px;
+            margin: 40px 0;
+            padding: 30px;
+            border: 3px dashed #333;
+            border-radius: 20px;
+            min-height: 120px;
+        }
+
+        .items {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .item {
+            font-size: 70px;
+            cursor: grab;
+            transition: transform 0.2s;
+        }
+
+        .item:hover {
+            transform: scale(1.1);
+        }
+
+        #resultMessage {
+            font-size: 28px;
+            margin-top: 20px;
+        }
+
+        .next-btn {
+            font-size: 28px;
+            padding: 15px 30px;
+            margin-top: 30px;
+        }
+
+        .rules-box {
+            margin-top: 40px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body class="winter-bg">
+
+<div class="game-container">
+
+    <button class="back-btn" onclick="goBack()">⬅ Назад</button>
+
+    <div id="wordContainer" class="big-word"></div>
+
+    <div id="itemsContainer" class="items"></div>
+
+    <p id="resultMessage"></p>
+    <button class="next-btn" onclick="startRound()">Next ❄</button>
+
+    <div class="rules-box">
+        <h2>🎯 How to play</h2>
+        <p>
+            Look at the big word.<br>
+            Drag the correct picture to the word!
+        </p>
+
+        <p class="ua-rules">
+            Подивись на велике слово.<br>
+            Перетягни правильну картинку до слова!
+        </p>
+    </div>
+
+</div>
+
+<script>
+const items = [
+    {word: "Hat", icon: "🎩"},
+    {word: "Scarf", icon: "🧣"},
+    {word: "Mitten", icon: "🧤"},
+    {word: "Sweater", icon: "🧥"},
+    {word: "Boots", icon: "🥾"},
+    {word: "Toy", icon: "🧸"},
+    {word: "Doll", icon: "🪆"},
+    {word: "Train", icon: "🚂"},
+    {word: "Snow", icon: "❄️"},
+    {word: "Ice", icon: "🧊"},
+    {word: "Star", icon: "⭐"}
+];
+
+let correctItem = null;
+
+function startRound() {
+    document.getElementById("resultMessage").textContent = "";
+
+    const wordContainer = document.getElementById("wordContainer");
+    const itemsContainer = document.getElementById("itemsContainer");
+
+    itemsContainer.innerHTML = "";
+
+    const shuffled = shuffle([...items]);
+    const roundItems = shuffled.slice(0, 4);
+    correctItem = roundItems[Math.floor(Math.random() * roundItems.length)];
+
+    wordContainer.textContent = correctItem.word.toUpperCase();
+
+    roundItems.forEach(item => {
+        let div = document.createElement("div");
+        div.className = "item";
+        div.textContent = item.icon;
+        div.draggable = true;
+
+        div.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", item.word);
+        });
+
+        itemsContainer.appendChild(div);
+    });
+}
+
+const wordContainer = document.getElementById("wordContainer");
+
+wordContainer.addEventListener("dragover", (e) => {
+    e.preventDefault();
+});
+
+wordContainer.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const draggedWord = e.dataTransfer.getData("text/plain");
+
+    if (draggedWord === correctItem.word) {
+        document.getElementById("resultMessage").textContent = "Good job! ✅";
+        speakText("Good job!");
+    } else {
+        document.getElementById("resultMessage").textContent = "Try again! ❌";
+        speakText("Try again!");
+    }
+});
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function speakText(text) {
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US";
+    speech.rate = 0.8;
+    window.speechSynthesis.speak(speech);
+}
+
+function goBack() {
+    window.location.href = "../index.html";
+}
+
+startRound();
+</script>
+
+</body>
+</html>

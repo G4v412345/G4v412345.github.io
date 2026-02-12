@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Winter Word Scramble ❄</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        #wordArea {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 40px 0;
+        }
+
+        .letter {
+            font-size: 60px;
+            padding: 20px 25px;
+            background: rgba(255,255,255,0.85);
+            border-radius: 15px;
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.2s;
+        }
+
+        .letter:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+
+        #resultMessage {
+            font-size: 28px;
+            margin-top: 20px;
+        }
+
+        .next-btn {
+            font-size: 28px;
+            padding: 15px 30px;
+            margin-top: 25px;
+            display: none;
+        }
+
+        .rules-box {
+            margin-top: 40px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body class="winter-bg">
+
+<div class="game-container">
+
+    <button class="back-btn" onclick="goBack()">⬅ Назад</button>
+
+
+    <div id="wordArea"></div>
+
+    <p id="resultMessage"></p>
+    <button class="next-btn" id="nextBtn" onclick="startRound()">Next ❄</button>
+
+    <div class="rules-box">
+        <h2>🎯 How to play</h2>
+        <p>
+            Drag the letters.<br>
+            Make the correct winter word!
+        </p>
+
+        <p class="ua-rules">
+            Перетягуй літери.<br>
+            Склади правильне зимове слово!
+        </p>
+    </div>
+
+</div>
+
+<script>
+const words = [
+    "ICE",
+    "SNOW",
+    "HAT",
+    "BOOT",
+    "STAR",
+    "FROST"
+];
+
+let currentWord = "";
+let draggedLetter = null;
+
+function startRound() {
+    document.getElementById("resultMessage").textContent = "";
+    document.getElementById("nextBtn").style.display = "none";
+
+    const area = document.getElementById("wordArea");
+    area.innerHTML = "";
+
+    currentWord = words[Math.floor(Math.random() * words.length)];
+
+    let letters = currentWord.split("");
+    letters = shuffle(letters);
+
+    letters.forEach(letter => {
+        const div = document.createElement("div");
+        div.className = "letter";
+        div.textContent = letter;
+        div.draggable = true;
+
+        div.addEventListener("dragstart", () => draggedLetter = div);
+        div.addEventListener("dragover", e => e.preventDefault());
+        div.addEventListener("drop", () => swapLetters(div));
+
+        area.appendChild(div);
+    });
+}
+
+function swapLetters(target) {
+    if (draggedLetter === target) return;
+
+    const temp = draggedLetter.textContent;
+    draggedLetter.textContent = target.textContent;
+    target.textContent = temp;
+
+    checkWord();
+}
+
+function checkWord() {
+    const letters = document.querySelectorAll(".letter");
+    let formedWord = "";
+
+    letters.forEach(l => formedWord += l.textContent);
+
+    if (formedWord === currentWord) {
+        document.getElementById("resultMessage").textContent = "Great! ✅";
+        document.getElementById("nextBtn").style.display = "inline-block";
+        speakText(currentWord);
+    }
+}
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function speakText(text) {
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US";
+    speech.rate = 0.8;
+    window.speechSynthesis.speak(speech);
+}
+
+function goBack() {
+    window.location.href = "../index.html";
+}
+
+startRound();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Catch the Snowflake ❄</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+
+#gameArea {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+    border: 3px solid white;
+    border-radius: 20px;
+    margin-top: 20px;
+}
+
+.falling-item {
+    position: absolute;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    animation: fall linear forwards;
+}
+
+.falling-item .emoji {
+    font-size: 50px;
+}
+
+.falling-item .word {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+@keyframes fall {
+    from { top: -80px; }
+    to { top: 520px; }
+}
+
+#scoreBoard {
+    font-size: 28px;
+    margin-top: 20px;
+}
+
+.rules-box {
+    margin-top: 40px;
+    font-size: 20px;
+}
+
+</style>
+</head>
+
+<body class="winter-bg">
+
+<div class="game-container">
+
+<button class="back-btn" onclick="goBack()">⬅ Назад</button>
+<div id="scoreBoard">
+Score: <span id="score">0</span>
+</div>
+
+<div id="gameArea"></div>
+
+<div class="rules-box">
+<h3>🎯 How to play</h3>
+<p>
+Click only winter items! <br>
+Do NOT click toys or clothes!
+</p>
+<p class="ua-rules">
+Натискай тільки зимові слова! <br>
+Не натискай іграшки або одяг!
+</p>
+</div>
+
+</div>
+
+<script>
+
+const allItems = [
+{word:"Winter", icon:"🌨️"},
+{word:"Snow", icon:"❄️"},
+{word:"Ice", icon:"🧊"},
+{word:"Cold", icon:"🥶"},
+{word:"Frost", icon:"🌬️"},
+{word:"Snowflake", icon:"❄️"},
+{word:"Toy", icon:"🧸"},
+{word:"Doll", icon:"🪆"},
+{word:"Train", icon:"🚂"},
+{word:"Hat", icon:"🎩"},
+{word:"Scarf", icon:"🧣"},
+{word:"Mitten", icon:"🧤"},
+{word:"Sweater", icon:"🧥"},
+{word:"Boots", icon:"🥾"},
+{word:"Christmas tree", icon:"🎄"},
+{word:"Star", icon:"⭐"}
+];
+
+const winterWords = [
+"Winter","Snow","Ice","Cold","Frost","Snowflake","Christmas tree","Star"
+];
+
+let score = 0;
+const gameArea = document.getElementById("gameArea");
+
+function createFallingItem() {
+
+    const item = allItems[Math.floor(Math.random() * allItems.length)];
+
+    const container = document.createElement("div");
+    container.className = "falling-item";
+
+    container.style.left = Math.random() * 85 + "%";
+    container.style.animationDuration = (3 + Math.random() * 2) + "s";
+
+    container.innerHTML = `
+        <div class="emoji">${item.icon}</div>
+        <div class="word">${item.word}</div>
+    `;
+
+    container.onclick = function() {
+
+        speakText(item.word);
+
+        if (winterWords.includes(item.word)) {
+            score++;
+        } else {
+            score--;
+        }
+
+        document.getElementById("score").textContent = score;
+        container.remove();
+    };
+
+    gameArea.appendChild(container);
+
+    setTimeout(() => {
+        container.remove();
+    }, 6000);
+}
+
+function speakText(text) {
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US";
+    speech.rate = 0.85;
+    window.speechSynthesis.speak(speech);
+}
+
+function goBack() {
+    window.location.href = "../index.html";
+}
+
+setInterval(createFallingItem, 1200);
+
+</script>
+
+</body>
+</html>

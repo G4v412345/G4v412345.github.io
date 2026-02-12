@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Christmas Sorting 🎄</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+
+body {
+    font-family: sans-serif;
+}
+
+#gameContainer {
+    width: 100%;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.itemsContainer {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.item {
+    font-size: 50px;
+    cursor: grab;
+    user-select: none;
+    text-align: center;
+    width: 80px;
+}
+
+.item .word {
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.baskets {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.basket {
+    width: 180px;
+    height: 200px;
+    border: 3px dashed white;
+    border-radius: 15px;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#scoreBoard {
+    font-size: 28px;
+    margin-top: 20px;
+}
+
+.rules-box {
+    margin-top: 30px;
+    font-size: 18px;
+}
+
+.basket.correct {
+    border-color: #4CAF50;
+}
+
+.basket.wrong {
+    border-color: #F44336;
+}
+
+</style>
+</head>
+<body class="winter-bg">
+
+<div id="gameContainer">
+
+<button class="back-btn" onclick="goBack()">⬅ Назад</button>
+
+<div id="scoreBoard">Score: <span id="score">0</span></div>
+
+<div class="itemsContainer" id="itemsContainer"></div>
+
+<div class="baskets">
+    <div class="basket" id="winterBasket">❄ Winter</div>
+    <div class="basket" id="toysBasket">🧸 Toys</div>
+    <div class="basket" id="clothesBasket">🧥 Clothes</div>
+</div>
+
+<div class="rules-box">
+<h3>🎯 How to play</h3>
+<p>Drag each emoji + word into the correct basket: Winter, Toys, or Clothes.</p>
+<p class="ua-rules">Перетягни кожний емодзі + слово у правильний кошик: Зима, Іграшки або Одяг.</p>
+</div>
+
+</div>
+
+<script>
+
+const items = [
+{word:"Winter", icon:"🌨️", category:"winter"},
+{word:"Snow", icon:"❄️", category:"winter"},
+{word:"Ice", icon:"🧊", category:"winter"},
+{word:"Cold", icon:"🥶", category:"winter"},
+{word:"Frost", icon:"🌬️", category:"winter"},
+{word:"Snowflake", icon:"❄️", category:"winter"},
+{word:"Toy", icon:"🧸", category:"toys"},
+{word:"Doll", icon:"🪆", category:"toys"},
+{word:"Train", icon:"🚂", category:"toys"},
+{word:"Hat", icon:"🎩", category:"clothes"},
+{word:"Scarf", icon:"🧣", category:"clothes"},
+{word:"Mitten", icon:"🧤", category:"clothes"},
+{word:"Sweater", icon:"🧥", category:"clothes"},
+{word:"Boots", icon:"🥾", category:"clothes"}
+];
+
+let score = 0;
+const itemsContainer = document.getElementById("itemsContainer");
+
+function startGame() {
+    score = 0;
+    document.getElementById("score").textContent = score;
+    itemsContainer.innerHTML = "";
+
+    const shuffledItems = shuffle([...items]);
+
+    shuffledItems.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.draggable = true;
+        div.innerHTML = `<div class="emoji">${item.icon}</div><div class="word">${item.word}</div>`;
+        div.dataset.category = item.category;
+
+        div.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", item.category);
+            e.dataTransfer.setData("text/id", item.word);
+        });
+
+        itemsContainer.appendChild(div);
+    });
+}
+
+function setupBaskets() {
+    const baskets = ["winterBasket","toysBasket","clothesBasket"];
+
+    baskets.forEach(id => {
+        const basket = document.getElementById(id);
+
+        basket.addEventListener("dragover", (e) => e.preventDefault());
+
+        basket.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const category = e.dataTransfer.getData("text/plain");
+            const word = e.dataTransfer.getData("text/id");
+
+            let basketCategory = "";
+            if(id === "winterBasket") basketCategory = "winter";
+            else if(id === "toysBasket") basketCategory = "toys";
+            else if(id === "clothesBasket") basketCategory = "clothes";
+
+            const itemDiv = Array.from(itemsContainer.children).find(div => div.querySelector(".word").textContent === word);
+
+            if(category === basketCategory) {
+                score++;
+                basket.classList.add("correct");
+                setTimeout(() => basket.classList.remove("correct"), 500);
+                itemDiv.remove();
+            } else {
+                score--;
+                basket.classList.add("wrong");
+                setTimeout(() => basket.classList.remove("wrong"), 500);
+            }
+
+            document.getElementById("score").textContent = score;
+        });
+    });
+}
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function speakText(text) {
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US";
+    speech.rate = 0.85;
+    window.speechSynthesis.speak(speech);
+}
+
+function goBack() {
+    window.location.href = "../index.html";
+}
+
+startGame();
+setupBaskets();
+
+</script>
+
+</body>
+</html>

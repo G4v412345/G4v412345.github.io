@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Who Is Happy? ❄</title>
+<link rel="stylesheet" href="../style.css">
+
+<style>
+
+.task {
+    font-size: 36px;
+    margin: 30px 0;
+}
+
+.characters {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.character {
+    font-size: 80px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.character:hover {
+    transform: scale(1.1);
+}
+
+#resultMessage {
+    font-size: 28px;
+    margin-top: 20px;
+}
+
+.next-btn {
+    font-size: 26px;
+    padding: 12px 25px;
+    margin-top: 25px;
+}
+</style>
+</head>
+
+<body class="winter-bg">
+
+<div class="game-container">
+
+<button class="back-btn" onclick="goBack()">⬅ Назад</button>
+
+<div id="taskText" class="task"></div>
+
+<div id="charactersContainer" class="characters"></div>
+
+<p id="resultMessage"></p>
+<button class="next-btn" onclick="startRound()">Next ❄</button>
+
+    <div class="rules-box">
+        <h2>🎯 How to play</h2>
+        <p>
+            Look at the picture.<br>
+            Click on the picture that matches the question!
+        </p>
+
+        <p class="ua-rules">
+            Подивись на картинку.<br>
+            Натисни на картинку, яка відповідає запитанню!
+        </p>
+    </div>
+
+</div>
+
+<script>
+const characters = [
+    {
+        look: "🧍‍♂️🎩🧣🧤🧥🥾",
+        status: "happy"
+    },
+    {
+        look: "🧍‍♀️🧥🥾",
+        status: "cold"
+    },
+    {
+        look: "🧍‍♂️🎩🧣🧥🥾",
+        status: "cold"
+    },
+];
+
+let correctAnswer = "";
+
+function startRound() {
+
+    document.getElementById("resultMessage").textContent = "";
+
+    const container = document.getElementById("charactersContainer");
+    container.innerHTML = "";
+
+    correctAnswer = Math.random() > 0.5 ? "happy" : "cold";
+
+    const taskText = correctAnswer === "happy"
+        ? "Click who is happy! 😊"
+        : "Click who is cold! 🥶";
+
+    document.getElementById("taskText").textContent = taskText;
+
+    speakText(taskText);
+
+    shuffle([...characters]).forEach(char => {
+        let div = document.createElement("div");
+        div.className = "character";
+        div.textContent = char.look;
+
+        div.onclick = () => checkAnswer(char.status);
+
+        container.appendChild(div);
+    });
+}
+
+function checkAnswer(status) {
+    if (status === correctAnswer) {
+        document.getElementById("resultMessage").textContent = "Good job! ✅";
+        speakText("Good job!");
+    } else {
+        document.getElementById("resultMessage").textContent = "Try again! ❌";
+        speakText("Try again!");
+    }
+}
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function speakText(text) {
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US";
+    speech.rate = 0.9;
+    window.speechSynthesis.speak(speech);
+}
+
+function goBack() {
+    window.location.href = "../index.html";
+}
+
+startRound();
+</script>
+
+</body>
+</html>

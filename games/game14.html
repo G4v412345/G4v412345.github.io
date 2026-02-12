@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Winter Memory Match 🧠❄</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        #gameBoard {
+            display: grid;
+            grid-template-columns: repeat(4, 120px);
+            gap: 40px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .card {
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 5px;
+            word-wrap: break-word;
+            overflow: hidden;
+            background-color: #fff;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.3s;
+            user-select: none;
+        }
+
+        /* разные размеры шрифта для слов и эмодзи */
+        .card.word {
+            font-size: 24px;
+        }
+
+        .card.icon {
+            font-size: 60px;
+        }
+
+        .card.flipped {
+            background-color: #d0f0ff;
+        }
+
+        .card.matched {
+            background-color: #a0e0a0;
+            cursor: default;
+            transform: scale(1.1);
+        }
+
+        #resultMessage {
+            font-size: 28px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .restart-btn {
+            display: block;
+            margin: 20px auto;
+            font-size: 24px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .rules-box {
+            margin-top: 40px;
+            font-size: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="winter-bg">
+
+<div class="game-container">
+
+    <button class="back-btn" onclick="goBack()">⬅ Назад</button>
+
+    <h1>Winter Memory Match </h1>
+    <div id="gameBoard"></div>
+
+    <p id="resultMessage"></p>
+    <button id="restartBtn" class="restart-btn" style="display:none;" onclick="startGame()">Restart 🔄</button>
+
+    <div class="rules-box">
+        <h2>🎯 How to play</h2>
+        <p>
+            Remember where each card is!<br>
+            Find all matching pairs 🧠
+        </p>
+
+        <p class="ua-rules">
+            Запам'ятай, де знаходиться кожна карта!<br>
+            Знайди всі пари 🧠
+        </p>
+    </div>
+
+</div>
+
+<script>
+const items = [
+    {word: "Hat", icon: "🎩"},
+    {word: "Scarf", icon: "🧣"},
+    {word: "Mitten", icon: "🧤"},
+    {word: "Boots", icon: "🥾"},
+];
+
+let gameCards = [];
+let flippedCards = [];
+let matchedPairs = 0;
+
+function startGame() {
+    const board = document.getElementById("gameBoard");
+    const restartBtn = document.getElementById("restartBtn");
+    board.innerHTML = "";
+    flippedCards = [];
+    matchedPairs = 0;
+    document.getElementById("resultMessage").textContent = "";
+    restartBtn.style.display = "none";
+
+    gameCards = [];
+    items.forEach(item => {
+        gameCards.push({content: item.word, matchId: item.word, type: "word"});
+        gameCards.push({content: item.icon, matchId: item.word, type: "icon"});
+    });
+
+    gameCards = shuffle(gameCards);
+
+    gameCards.forEach((card, index) => {
+        const div = document.createElement("div");
+        div.className = `card ${card.type}`;
+        div.dataset.index = index;
+        div.textContent = card.content; 
+        board.appendChild(div);
+    });
+
+    setTimeout(() => {
+        document.querySelectorAll(".card").forEach(div => div.textContent = "");
+        document.querySelectorAll(".card").forEach(div => div.addEventListener("click", () => flipCard(div)));
+    }, 3000);
+}
+
+function flipCard(cardDiv) {
+    const index = cardDiv.dataset.index;
+    const cardData = gameCards[index];
+
+    if (cardDiv.classList.contains("flipped") || cardDiv.classList.contains("matched")) return;
+    if (flippedCards.length >= 2) return;
+
+    cardDiv.classList.add("flipped");
+    cardDiv.textContent = cardData.content;
+    cardDiv.className = `card flipped ${cardData.type}`;
+    flippedCards.push({div: cardDiv, data: cardData});
+
+    if (flippedCards.length === 2) {
+        setTimeout(checkMatch, 800);
+    }
+}
+
+function checkMatch() {
+    const [first, second] = flippedCards;
+
+    if (first.data.matchId === second.data.matchId && first.div !== second.div) {
+        first.div.classList.add("matched");
+        second.div.classList.add("matched");
+        matchedPairs++;
+        speakText("Good job!");
+    } else {
+        first.div.classList.remove("flipped");
+        second.div.classList.remove("flipped");
+        first.div.textContent = "";
+        second.div.textContent = "";
+        first.div.className = `card ${first.data.type}`;
+        second.div.className = `card ${second.data.type}`;
+        speakText("Try again!");
+    }
+
+    flippedCards = [];
+
+    if (matchedPairs === items.length) {
+        document.getElementById("resultMessage").textContent = "🎉 You matched all pairs!";
+        document.getElementById("restartBtn").style.display = "block";
+    }
+}
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function speakText(text) {
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US";
+    speech.rate = 0.8;
+    window.speechSynthesis.speak(speech);
+}
+
+function goBack() {
+    window.location.href = "../index.html";
+}
+
+startGame();
+</script>
+
+</body>
+</html>
